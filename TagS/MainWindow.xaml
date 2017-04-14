@@ -5,8 +5,48 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TagS"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="368" Width="558">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="0*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <Label x:Name="filename" Content="File Name : x" BorderThickness="0,0,0,3" BorderBrush="#FFB4B4B4" Background="White" FontWeight="Bold"/>
+
+            <Label Content="Song Title : " Grid.Row="0" Margin="0 1 0 0 " BorderThickness="1,1,1,1" BorderBrush="White">
+                <Label.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+                        <GradientStop Color="White" Offset="0"/>
+                        <GradientStop Color="#FFE5F0F3" Offset="1"/>
+                    </LinearGradientBrush>
+                </Label.Background>
+            </Label>
+            <TextBox x:Name="songtitle"></TextBox>
+
+            <Label Content="Artist : "/>
+            <TextBox x:Name="artist"></TextBox>
+
+            <Label Content="Album : "/>
+            <TextBox x:Name="album"></TextBox>
+
+            <Label Content="Genre : "/>
+            <TextBox x:Name="genre"></TextBox>
+
+            <Label Content="Year : "/>
+            <TextBox x:Name="year" PreviewTextInput="NumberValidation"></TextBox>
+
+            <DockPanel Grid.Row="1">
+                <Button x:Name="next" Content="Next" Height="20" Width="50"  DockPanel.Dock="Right" HorizontalAlignment="Right" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Margin="2 0 0 0" Click="SetTags"></Button>
+                <Button Content="Back" Height="20" Width="50"  DockPanel.Dock="Right" HorizontalAlignment="Center" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Click="BackButton"></Button>
+                <Button Content="Choose files" Height="20" Width="auto"  DockPanel.Dock="Right" HorizontalAlignment="Left" Click="Choose_Directory" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Padding="6 0 6 0"/>
+
+            </DockPanel>
+        </StackPanel>
     </Grid>
 </Window>
