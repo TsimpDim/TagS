@@ -52,7 +52,7 @@ namespace TagS
                 System.Windows.MessageBox.Show("Please select music files to examine...", "Error!");
                 return;
             }
-            if (count < files.Length)
+            if (count < files.Length - 1)
             {
 
 
@@ -71,8 +71,6 @@ namespace TagS
                 file.Save();
 
                 EmptyTextFields();
-
-
                 AutoFillFields();
 
 
@@ -103,6 +101,8 @@ namespace TagS
             filename.Content = "File Name : " + System.IO.Path.GetFileName(files[count]); //Display the file name on the header
 
 
+            counter.Text = (count+1).ToString() + '/' + files.Length.ToString();
+
             //Check in case there are no dashes
             if (songname.LastIndexOf('-') >= 0)
                 songtitle.Text = songname.Substring(songname.LastIndexOf('-') + 2); //Text after '-' , '+2' so that there isn't whitespace before the string
@@ -113,13 +113,35 @@ namespace TagS
             if (songname.IndexOf('-') >= 0)
                 artist.Text = songname.Substring(0, songname.IndexOf('-') - 1); //Text before it , likewise '-1'
 
+            if (count + 1 == files.Length)
+                next.Content = "Finish";
+            else
+                next.Content = "Next";
+
         }
 
         private void BackButton(object sender, RoutedEventArgs e)
         {
-            count--;
-            EmptyTextFields();
-            AutoFillFields();
+            if(count >= 1)
+            {
+                count--;
+                EmptyTextFields();
+                AutoFillFields();
+            }
+            else
+            {
+                System.Windows.MessageBox.Show("There are no previous files");
+            }
+
+        }
+
+
+        private void GotoNext(object sender, KeyEventArgs e)
+        {
+            if ((e.Key == Key.F2))
+                SetTags(sender,e);
+            else if(e.Key == Key.F1)
+                BackButton(sender,e);
         }
     }
 
