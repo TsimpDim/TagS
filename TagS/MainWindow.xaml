@@ -20,61 +20,40 @@
         <StackPanel>
             <Label x:Name="filename" Content="File Name : x" BorderThickness="0,0,0,3" BorderBrush="#FFB4B4B4" Background="White" FontWeight="Bold"/>
 
-            <Label Content="Song Title : " Grid.Row="0" Margin="0 1 0 0 " BorderThickness="1,1,1,1" BorderBrush="White">
-                <Label.Background>
-                    <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                        <GradientStop Color="White" Offset="0"/>
-                        <GradientStop Color="#FFE5F0F3" Offset="1"/>
-                    </LinearGradientBrush>
-                </Label.Background>
-            </Label>
-            <TextBox x:Name="songtitle"></TextBox>
+            <Label Content="Song Title" Grid.Row="0" Background="{x:Null}"  BorderThickness="0,0,0,1" BorderBrush="#FFD7EFF5"/>
+            <TextBox x:Name="songtitle" BorderBrush="#CC6CBCFF" BorderThickness="0,0,0,2" CaretBrush="Black" Background="#FFE1F3FF"></TextBox>
 
-            <Label Content="Artist : ">
-                <Label.Background>
-                    <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                        <GradientStop Color="White" Offset="0"/>
-                        <GradientStop Color="#FFE5F0F3" Offset="1"/>
-                    </LinearGradientBrush>
-                </Label.Background>
-            </Label>
-            <TextBox x:Name="artist"></TextBox>
+            <Label Content="Artist " Background="{x:Null}" BorderThickness="0,0,0,1" BorderBrush="#FFD7EFF5"/>
+            <TextBox x:Name="artist" BorderBrush="#FF6CBCFF" BorderThickness="0,0,0,2" Background="#FFE1F3FF"></TextBox>
 
-            <Label Content="Album : ">
-                <Label.Background>
-                    <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                        <GradientStop Color="White" Offset="0"/>
-                        <GradientStop Color="#FFE5F0F3" Offset="1"/>
-                    </LinearGradientBrush>
-                </Label.Background>
-            </Label>
-            <TextBox x:Name="album"></TextBox>
+            <Label Content="Album " Background="{x:Null}"  BorderThickness="0,0,0,1" BorderBrush="#FFD7EFF5"/>
+            <TextBox x:Name="album" BorderBrush="#FF6CBCFF" BorderThickness="0,0,0,2" Background="#FFE1F3FF"></TextBox>
 
-            <Label Content="Genre : ">
-                <Label.Background>
-                    <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                        <GradientStop Color="White" Offset="0"/>
-                        <GradientStop Color="#FFE5F0F3" Offset="1"/>
-                    </LinearGradientBrush>
-                </Label.Background>
-            </Label>
-            <TextBox x:Name="genre"></TextBox>
+            <Label Content="Genre " Background="{x:Null}"  BorderThickness="0,0,0,1" BorderBrush="#FFD7EFF5"/>
+            <TextBox x:Name="genre" BorderBrush="#FF6CBCFF" BorderThickness="0,0,0,2" Background="#FFE1F3FF"></TextBox>
 
-            <Label Content="Year : ">
-                <Label.Background>
-                    <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                        <GradientStop Color="White" Offset="0"/>
-                        <GradientStop Color="#FFE5F0F3" Offset="1"/>
-                    </LinearGradientBrush>
-                </Label.Background>
-            </Label>
-            <TextBox x:Name="year" PreviewTextInput="NumberValidation"></TextBox>
+            <Label Content="Year " Background="{x:Null}"  BorderThickness="0,0,0,1" BorderBrush="#FFD7EFF5"/>
+            <TextBox x:Name="year" PreviewTextInput="NumberValidation" BorderBrush="#FF6CBCFF" BorderThickness="0,0,0,2" Background="#FFE1F3FF"></TextBox>
 
-            <DockPanel Grid.Row="1">
-               
+            <Label Content="Cover Image" Background="{x:Null}"  BorderThickness="0,0,0,1" BorderBrush="#FFD7EFF5"/>
+            
+            
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="30"/>
+                </Grid.ColumnDefinitions>
                 
-                <Button x:Name="next" Content="Next" Height="20" Width="50"  DockPanel.Dock="Right" HorizontalAlignment="Right" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Margin="2 5 0 5" Click="SetTags"></Button>
-                <Button Content="Back" Height="20" Width="50"  DockPanel.Dock="Right" HorizontalAlignment="Center" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Click="BackButton"></Button>
+                <TextBox x:Name="coverimg" BorderBrush="#FF6CBCFF" BorderThickness="0,0,0,2" Background="#FFE1F3FF" Grid.Column="0"></TextBox>
+                <Button Width="30" Content="..." Grid.Column="1"  Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Click="ChooseCover"></Button>
+            </Grid>
+            
+            
+            <DockPanel Grid.Row="1">
+
+
+                <Button x:Name="next" Content="Next[F2]" Height="20" Width="50"  DockPanel.Dock="Right" HorizontalAlignment="Right" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Margin="2 5 0 5" Padding="0 0 0 2" Click="SetTags"></Button>
+                <Button Content="Back[F1]" Height="20" Width="50"  DockPanel.Dock="Right" HorizontalAlignment="Center" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Click="BackButton" Padding="0 0 0 2"></Button>
                 <TextBlock  x:Name="counter" DockPanel.Dock="Right" HorizontalAlignment="Center" Text="x/x" VerticalAlignment="Center" Margin="0 0 10 0"/>
 
                 <Button Content="Choose files" Height="20" Width="auto"  DockPanel.Dock="Right" HorizontalAlignment="Left" Click="Choose_Directory" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Padding="6 0 6 0"/>

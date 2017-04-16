@@ -23,8 +23,10 @@ namespace TagS
     /// </summary>
     public partial class MainWindow : Window
     {
-        string []files = { "-1" };
+        string []files = { "-1" }; //Initializer "-1" is used in error prevention
         int count = 0;
+        string coverimg_path = "-1";
+        TagLib.File file;
 
         public MainWindow()
         {
@@ -39,8 +41,16 @@ namespace TagS
             openDlg.ShowDialog();
             files = openDlg.FileNames;
 
+
             if (openDlg.FileNames.Length != 0)
-                AutoFillFields();
+            {
+                file = TagLib.File.Create(files[count]); //Open the file
+                if (!HasTags())
+                    AutoFillFields();
+                else
+                    FillPreExisting();
+            }
+
 
 
         }
@@ -56,22 +66,34 @@ namespace TagS
             {
 
 
-                var file = TagLib.File.Create(files[count++]); //Open the file
 
+                if (coverimg_path != "-1")//If an image has been selected
+                {
+                    TagLib.Picture pic = new TagLib.Picture(); //Type for the cover art
+                    pic.Type = TagLib.PictureType.FrontCover; //Set as cover
+                    pic.Description = "Cover Art";
+                    pic.Data = coverimg_path;
+                    file.Tag.Pictures = new TagLib.IPicture[1] { pic }; //Add the tag
+                }
+
+                //Set the rest of the tags
                 file.Tag.Title = songtitle.Text;
                 file.Tag.Album = album.Text;
                 file.Tag.Performers = new String[1] { artist.Text };
-                if (year.Text.Length != 0)
+                if (year.Text.Length != 0)//If a year has been given, use it
                     file.Tag.Year = Convert.ToUInt32(year.Text);
-                else
-                    file.Tag.Year = Convert.ToUInt32(DateTime.Now.Year);
+
                 file.Tag.Genres = new String[1] { genre.Text };
+                file.Save(); //Save the file!
 
-
-                file.Save();
+                count++;
 
                 EmptyTextFields();
-                AutoFillFields();
+
+                if (!HasTags())//If the currect .mp3 file doesn't have tags , auto fill them
+                    AutoFillFields();
+                else
+                    FillPreExisting();
 
 
             }
@@ -94,7 +116,19 @@ namespace TagS
             artist.Text = "";
             year.Text = "";
             genre.Text = "";
+            coverimg.Text = "";
         }
+
+        public bool HasTags()
+        {
+            
+            TagLib.Tag filetags= file.Tag;
+            if (filetags.Genres.Length > 0 || Convert.ToBoolean(filetags.Year) || filetags.Performers.Length > 0 || filetags.Title != "" || filetags.Album != "")
+                return true;
+
+            return false;
+        }
+
         public void AutoFillFields()
         {
             var songname = System.IO.Path.GetFileNameWithoutExtension(files[count]);
@@ -116,7 +150,7 @@ namespace TagS
             if (count + 1 == files.Length)
                 next.Content = "Finish";
             else
-                next.Content = "Next";
+                next.Content = "Next[F2]";
 
         }
 
@@ -135,7 +169,6 @@ namespace TagS
 
         }
 
-
         private void GotoNext(object sender, KeyEventArgs e)
         {
             if ((e.Key == Key.F2))
@@ -143,6 +176,41 @@ namespace TagS
             else if(e.Key == Key.F1)
                 BackButton(sender,e);
         }
+
+        private void ChooseCover(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openDlg = new OpenFileDialog(); //Create a new FileDialog
+            openDlg.Multiselect = false;
+            openDlg.Filter = "JPEG Files(*.jpg) | *.jpg"; 
+            openDlg.ShowDialog();
+
+            if(openDlg.FileNames.Length > 0)
+                coverimg_path = openDlg.FileNames[0];
+
+            if (coverimg_path != "-1")//Fill the text field with the path
+                coverimg.Text = coverimg_path;
+        }
+
+        private void FillPreExisting()
+        {
+            var songname = System.IO.Path.GetFileNameWithoutExtension(files[count]);
+            filename.Content = "File Name : " + System.IO.Path.GetFileName(files[count]); //Display the file name on the header
+
+
+            counter.Text = (count + 1).ToString() + '/' + files.Length.ToString();
+
+            songtitle.Text = file.Tag.Title;
+            artist.Text = file.Tag.Performers[0];
+            year.Text = file.Tag.Year.ToString();
+            album.Text = file.Tag.Album;
+            genre.Text = file.Tag.Genres[0];
+
+            if (count + 1 == files.Length)
+                next.Content = "Finish";
+            else
+                next.Content = "Next[F2]";
+        }
+          
     }
 
 
