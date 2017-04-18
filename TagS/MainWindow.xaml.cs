@@ -34,6 +34,8 @@ namespace TagS
             autofillbut.Visibility = Visibility.Hidden; 
         }
 
+
+
         private void Choose_Directory(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openDlg = new OpenFileDialog(); //Create a new FileDialog
@@ -58,7 +60,7 @@ namespace TagS
 
         }
 
-        private void SetTags(object sender, RoutedEventArgs e)
+        private void SetTags()
         {
             if(files[0] == "-1")
             {
@@ -111,36 +113,10 @@ namespace TagS
             }
         }
 
-        private void NumberValidation(object sender, TextCompositionEventArgs e)//Allow only numbers
-        {
-            Regex regex = new Regex("[^0-9]+");
-            e.Handled = regex.IsMatch(e.Text);
-        }
 
-        public void EmptyTextFields()
-        {
-            songtitle.Text = "";
-            album.Text = "";
-            artist.Text = "";
-            year.Text = "";
-            genre.Text = "";
-            coverimg.Text = "";
-        }
+        
 
-        public bool HasTags()
-        {
-            
-            TagLib.Tag filetags= file.Tag;
-            if (filetags.Genres.Length > 0 || Convert.ToBoolean(filetags.Year) || filetags.Performers.Length > 0 || filetags.Title != "" || filetags.Album != "")
-            {
-                autofillbut.Visibility = Visibility.Visible;
-                return true;
-            }
-
-
-            autofillbut.Visibility = Visibility.Hidden;
-            return false;
-        }
+        
 
         public void AutoFillFields()
         {
@@ -173,9 +149,32 @@ namespace TagS
 
         }
 
-        private void BackButton(object sender, RoutedEventArgs e)
+        private void FillPreExisting()
         {
-            if(count >= 1)
+            file = TagLib.File.Create(files[count]);
+            var songname = System.IO.Path.GetFileNameWithoutExtension(files[count]);
+            filename.Content = "File Name : " + System.IO.Path.GetFileName(files[count]); //Display the file name on the header
+
+            counter.Text = (count + 1).ToString() + '/' + files.Length.ToString();
+
+            songtitle.Text = file.Tag.Title;
+
+            if (file.Tag.Performers.Length > 0)
+                artist.Text = file.Tag.Performers[0];
+            year.Text = file.Tag.Year.ToString();
+            album.Text = file.Tag.Album;
+            if (file.Tag.Genres.Length > 0)
+                genre.Text = file.Tag.Genres[0];
+
+            if (count + 1 == files.Length)
+                next.Content = "Finish[F2]";
+            else
+                next.Content = "Next[F2]";
+        }
+
+        private void GoBack()
+        {
+            if (count >= 1)
             {
                 count--;
                 EmptyTextFields();
@@ -186,15 +185,49 @@ namespace TagS
             {
                 System.Windows.MessageBox.Show("There are no previous files");
             }
-
         }
 
-        private void GotoNext(object sender, KeyEventArgs e)
+        public void EmptyTextFields()
+        {
+            songtitle.Text = "";
+            album.Text = "";
+            artist.Text = "";
+            year.Text = "";
+            genre.Text = "";
+            coverimg.Text = "";
+        }
+
+
+        public bool HasTags()
+        {
+
+            TagLib.Tag filetags = file.Tag;
+            if (filetags.Genres.Length > 0 || Convert.ToBoolean(filetags.Year) || filetags.Performers.Length > 0 || filetags.Title != "" || filetags.Album != "")
+            {
+                autofillbut.Visibility = Visibility.Visible;
+                return true;
+            }
+
+
+            autofillbut.Visibility = Visibility.Hidden;
+            return false;
+        }
+
+        private void NumberValidation(object sender, TextCompositionEventArgs e)//Allow only numbers
+        {
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+
+
+        private void ShortcutKeys(object sender, KeyEventArgs e)
         {
             if ((e.Key == Key.F2))
-                SetTags(sender,e);
-            else if(e.Key == Key.F1)
-                BackButton(sender,e);
+                SetTags();
+            else if (e.Key == Key.F1)
+                GoBack();
+            else if (e.Key == Key.F3)
+                AutoFillFields();
         }
 
         private void ChooseCover(object sender, RoutedEventArgs e)
@@ -211,32 +244,21 @@ namespace TagS
                 coverimg.Text = coverimg_path;
         }
 
-        private void FillPreExisting()
-        {
-            file = TagLib.File.Create(files[count]);
-            var songname = System.IO.Path.GetFileNameWithoutExtension(files[count]);
-            filename.Content = "File Name : " + System.IO.Path.GetFileName(files[count]); //Display the file name on the header
 
-            counter.Text = (count + 1).ToString() + '/' + files.Length.ToString();
-
-            songtitle.Text = file.Tag.Title;
-
-            if(file.Tag.Performers.Length > 0)
-                artist.Text = file.Tag.Performers[0];
-            year.Text = file.Tag.Year.ToString();
-            album.Text = file.Tag.Album;
-            if(file.Tag.Genres.Length > 0)
-                genre.Text = file.Tag.Genres[0];
-
-            if (count + 1 == files.Length)
-                next.Content = "Finish[F2]";
-            else
-                next.Content = "Next[F2]";
-        }
 
         private void AutoFill_Button(object sender, RoutedEventArgs e)
         {
             AutoFillFields();
+        }
+
+        private void Back_Button(object sender, RoutedEventArgs e)
+        {
+            GoBack();
+        }
+
+        private void Next_Button(object sender, RoutedEventArgs e)
+        {
+            SetTags();
         }
     }
 
