@@ -52,11 +52,13 @@
             <DockPanel Grid.Row="1">
 
 
-                <Button x:Name="next" Content="Next[F2]" Height="20" Width="50"  DockPanel.Dock="Right" HorizontalAlignment="Right" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Margin="2 5 0 5" Padding="0 0 0 2" Click="SetTags"></Button>
+                <Button x:Name="next" Content="Next[F2]" Height="20" Width="60"  DockPanel.Dock="Right" HorizontalAlignment="Right" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Margin="2 5 0 5" Padding="0 0 0 2" Click="SetTags"></Button>
                 <Button Content="Back[F1]" Height="20" Width="50"  DockPanel.Dock="Right" HorizontalAlignment="Center" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Click="BackButton" Padding="0 0 0 2"></Button>
                 <TextBlock  x:Name="counter" DockPanel.Dock="Right" HorizontalAlignment="Center" Text="x/x" VerticalAlignment="Center" Margin="0 0 10 0"/>
 
-                <Button Content="Choose files" Height="20" Width="auto"  DockPanel.Dock="Right" HorizontalAlignment="Left" Click="Choose_Directory" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Padding="6 0 6 0"/>
+                <Button Content="Choose files" Height="20" Width="auto"  DockPanel.Dock="Left" HorizontalAlignment="Left" Click="Choose_Directory" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Padding="6 0 6 0"/>
+                <Button x:Name="autofillbut"  Content="AutoFill[F3]" Height="20" Width="auto"  DockPanel.Dock="Left" HorizontalAlignment="Left" Click="AutoFill_Button" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Padding="6 0 6 0" Margin="5 0 0 0"/>
+
             </DockPanel>
         </StackPanel>
     </Grid>

@@ -31,6 +31,7 @@ namespace TagS
         public MainWindow()
         {
             InitializeComponent();
+            autofillbut.Visibility = Visibility.Hidden; 
         }
 
         private void Choose_Directory(object sender, RoutedEventArgs e)
@@ -42,6 +43,7 @@ namespace TagS
             files = openDlg.FileNames;
 
 
+
             if (openDlg.FileNames.Length != 0)
             {
                 file = TagLib.File.Create(files[count]); //Open the file
@@ -49,8 +51,9 @@ namespace TagS
                     AutoFillFields();
                 else
                     FillPreExisting();
-            }
 
+            }
+            
 
 
         }
@@ -62,11 +65,11 @@ namespace TagS
                 System.Windows.MessageBox.Show("Please select music files to examine...", "Error!");
                 return;
             }
-            if (count < files.Length - 1)
+            if (count < files.Length)
             {
 
-
-
+                
+                file = TagLib.File.Create(files[count]);
                 if (coverimg_path != "-1")//If an image has been selected
                 {
                     TagLib.Picture pic = new TagLib.Picture(); //Type for the cover art
@@ -85,16 +88,21 @@ namespace TagS
 
                 file.Tag.Genres = new String[1] { genre.Text };
                 file.Save(); //Save the file!
-
                 count++;
 
                 EmptyTextFields();
 
-                if (!HasTags())//If the currect .mp3 file doesn't have tags , auto fill them
-                    AutoFillFields();
+                if (count < files.Length)
+                {
+                    if (!HasTags())//If the currect .mp3 file doesn't have tags , auto fill them
+                        AutoFillFields();
+                    else
+                        FillPreExisting();
+                }
                 else
-                    FillPreExisting();
-
+                {
+                    Application.Current.Shutdown(); //Not sure if i can merge this with the one IF below
+                }
 
             }
             else
@@ -124,8 +132,13 @@ namespace TagS
             
             TagLib.Tag filetags= file.Tag;
             if (filetags.Genres.Length > 0 || Convert.ToBoolean(filetags.Year) || filetags.Performers.Length > 0 || filetags.Title != "" || filetags.Album != "")
+            {
+                autofillbut.Visibility = Visibility.Visible;
                 return true;
+            }
 
+
+            autofillbut.Visibility = Visibility.Hidden;
             return false;
         }
 
@@ -146,11 +159,17 @@ namespace TagS
 
             if (songname.IndexOf('-') >= 0)
                 artist.Text = songname.Substring(0, songname.IndexOf('-') - 1); //Text before it , likewise '-1'
+            else
+                artist.Text = "";
 
             if (count + 1 == files.Length)
-                next.Content = "Finish";
+                next.Content = "Finish[F2]";
             else
                 next.Content = "Next[F2]";
+
+            year.Text = "";
+            genre.Text = "";
+            album.Text = "";
 
         }
 
@@ -160,7 +179,8 @@ namespace TagS
             {
                 count--;
                 EmptyTextFields();
-                AutoFillFields();
+                //AutoFillFields();
+                FillPreExisting();
             }
             else
             {
@@ -193,24 +213,31 @@ namespace TagS
 
         private void FillPreExisting()
         {
+            file = TagLib.File.Create(files[count]);
             var songname = System.IO.Path.GetFileNameWithoutExtension(files[count]);
             filename.Content = "File Name : " + System.IO.Path.GetFileName(files[count]); //Display the file name on the header
-
 
             counter.Text = (count + 1).ToString() + '/' + files.Length.ToString();
 
             songtitle.Text = file.Tag.Title;
-            artist.Text = file.Tag.Performers[0];
+
+            if(file.Tag.Performers.Length > 0)
+                artist.Text = file.Tag.Performers[0];
             year.Text = file.Tag.Year.ToString();
             album.Text = file.Tag.Album;
-            genre.Text = file.Tag.Genres[0];
+            if(file.Tag.Genres.Length > 0)
+                genre.Text = file.Tag.Genres[0];
 
             if (count + 1 == files.Length)
-                next.Content = "Finish";
+                next.Content = "Finish[F2]";
             else
                 next.Content = "Next[F2]";
         }
-          
+
+        private void AutoFill_Button(object sender, RoutedEventArgs e)
+        {
+            AutoFillFields();
+        }
     }
 
 
