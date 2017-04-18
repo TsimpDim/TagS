@@ -87,6 +87,8 @@ namespace TagS
                 file.Tag.Performers = new String[1] { artist.Text };
                 if (year.Text.Length != 0)//If a year has been given, use it
                     file.Tag.Year = Convert.ToUInt32(year.Text);
+                else
+                    file.Tag.Year = 0;
 
                 file.Tag.Genres = new String[1] { genre.Text };
                 file.Save(); //Save the file!
@@ -159,11 +161,17 @@ namespace TagS
 
             songtitle.Text = file.Tag.Title;
 
-            if (file.Tag.Performers.Length > 0)
+            if (file.Tag.Performers.Length > 0)//If there are any performers
                 artist.Text = file.Tag.Performers[0];
-            year.Text = file.Tag.Year.ToString();
+
+            if(file.Tag.Year != 0)//If there is a valid year
+                year.Text = file.Tag.Year.ToString();
+
+
             album.Text = file.Tag.Album;
-            if (file.Tag.Genres.Length > 0)
+
+
+            if (file.Tag.Genres.Length > 0)//If any Genre has been given
                 genre.Text = file.Tag.Genres[0];
 
             if (count + 1 == files.Length)
@@ -198,6 +206,7 @@ namespace TagS
         }
 
 
+
         public bool HasTags()
         {
 
@@ -213,11 +222,12 @@ namespace TagS
             return false;
         }
 
-        private void NumberValidation(object sender, TextCompositionEventArgs e)//Allow only numbers
+        private void NumberValidation(object sender, TextCompositionEventArgs e)//Allow only numbers on the "Year" field
         {
             Regex regex = new Regex("[^0-9]+");
             e.Handled = regex.IsMatch(e.Text);
         }
+
 
 
         private void ShortcutKeys(object sender, KeyEventArgs e)
