@@ -14,7 +14,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Text.RegularExpressions;
-
+using System.IO;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace TagS
 {
@@ -62,7 +64,7 @@ namespace TagS
 
         private void SetTags()
         {
-            if(files[0] == "-1")
+            if(files.Length == 0 || files[0] == "-1")
             {
                 System.Windows.MessageBox.Show("Please select music files to examine...", "Error!");
                 return;
@@ -77,9 +79,13 @@ namespace TagS
                     TagLib.Picture pic = new TagLib.Picture(); //Type for the cover art
                     pic.Type = TagLib.PictureType.FrontCover; //Set as cover
                     pic.Description = "Cover Art";
-                    pic.Data = coverimg_path;
+                    pic.MimeType = System.Net.Mime.MediaTypeNames.Image.Jpeg;
+                    pic.Data = TagLib.ByteVector.FromPath(coverimg_path);
                     file.Tag.Pictures = new TagLib.IPicture[1] { pic }; //Add the tag
-                }
+
+                }else if(coverimg.Text.ToLower() == "del")//"Erase" the cover art
+                    file.Tag.Pictures = null;
+
 
                 //Set the rest of the tags
                 file.Tag.Title = songtitle.Text;
@@ -91,10 +97,13 @@ namespace TagS
                     file.Tag.Year = 0;
 
                 file.Tag.Genres = new String[1] { genre.Text };
+
+
                 file.Save(); //Save the file!
                 count++;
 
                 EmptyTextFields();
+                coverimg_path ="-1"; //Reset the image path variable so that the check on the next file works correctly
 
                 if (count < files.Length)
                 {
@@ -123,7 +132,7 @@ namespace TagS
         public void AutoFillFields()
         {
             var songname = System.IO.Path.GetFileNameWithoutExtension(files[count]);
-            filename.Content = "File Name : " + System.IO.Path.GetFileName(files[count]); //Display the file name on the header
+            filename.Text = "File Name : " + System.IO.Path.GetFileName(files[count]); //Display the file name on the header
 
 
             counter.Text = (count+1).ToString() + '/' + files.Length.ToString();
@@ -155,11 +164,14 @@ namespace TagS
         {
             file = TagLib.File.Create(files[count]);
             var songname = System.IO.Path.GetFileNameWithoutExtension(files[count]);
-            filename.Content = "File Name : " + System.IO.Path.GetFileName(files[count]); //Display the file name on the header
+            filename.Text = "File Name : " + System.IO.Path.GetFileName(files[count]); //Display the file name on the header
 
             counter.Text = (count + 1).ToString() + '/' + files.Length.ToString();
 
             songtitle.Text = file.Tag.Title;
+
+       
+
 
             if (file.Tag.Performers.Length > 0)//If there are any performers
                 artist.Text = file.Tag.Performers[0];
@@ -168,17 +180,44 @@ namespace TagS
                 year.Text = file.Tag.Year.ToString();
 
 
-            album.Text = file.Tag.Album;
+            album.Text = file.Tag.Album;//Assign the Album name either way
 
 
             if (file.Tag.Genres.Length > 0)//If any Genre has been given
                 genre.Text = file.Tag.Genres[0];
 
+            if (file.Tag.Pictures.Length > 0)
+            {
+                var bin = file.Tag.Pictures[0].Data.Data; //Create a byte[] out of the tag data
+
+                img_thumbnail.Source = ToImage(bin);//Make it an image and display it
+                img_thumbnail.Height = 256;
+                img_thumbnail.Width = 256;
+
+                coverimg.Text = "Type 'Del' to erase the cover";
+            }
+            else {
+
+                if (img_thumbnail.Source != null) //If there isn't a picture assigned but the image control still has the previous source, flush the control
+                {
+                    img_thumbnail.Source = null;
+                    img_thumbnail.Height = 0;
+                    img_thumbnail.Width = 0;
+                }
+            }
+
+               
+
+
             if (count + 1 == files.Length)
                 next.Content = "Finish[F2]";
             else
                 next.Content = "Next[F2]";
+
+
         }
+
+
 
         private void GoBack()
         {
@@ -205,6 +244,14 @@ namespace TagS
             coverimg.Text = "";
         }
 
+        public BitmapImage ToImage(byte[] array)
+        {
+            BitmapImage image = new BitmapImage();
+            image.BeginInit();
+            image.StreamSource = new System.IO.MemoryStream(array);
+            image.EndInit();
+            return image;
+        }
 
 
         public bool HasTags()
@@ -228,6 +275,7 @@ namespace TagS
             e.Handled = regex.IsMatch(e.Text);
         }
 
+        
 
 
         private void ShortcutKeys(object sender, KeyEventArgs e)
@@ -251,7 +299,14 @@ namespace TagS
                 coverimg_path = openDlg.FileNames[0];
 
             if (coverimg_path != "-1")//Fill the text field with the path
+            {
                 coverimg.Text = coverimg_path;
+                var bin = File.ReadAllBytes(coverimg_path); //Create a byte[] out of the tag data
+
+                img_thumbnail.Source = ToImage(bin);//Make it an image and display it
+                img_thumbnail.Height = 256;
+                img_thumbnail.Width = 256;
+            }
         }
 
 
@@ -269,6 +324,12 @@ namespace TagS
         private void Next_Button(object sender, RoutedEventArgs e)
         {
             SetTags();
+        }
+
+        private void CoverImage_Click(object sender, MouseButtonEventArgs e) // CHECK FOR KEYBOARD FOCUS TOO <!>
+        {
+            if(coverimg.Text == "Type 'Del' to erase the cover")
+                coverimg.Text = "";
         }
     }
 

@@ -18,7 +18,9 @@
         </Grid.RowDefinitions>
 
         <StackPanel>
-            <Label x:Name="filename" Content="File Name : x" BorderThickness="0,0,0,3" BorderBrush="#FFB4B4B4" Background="White" FontWeight="Bold"/>
+            <Label  BorderThickness="0,0,0,3" BorderBrush="#FFB4B4B4" Background="White" FontWeight="Bold">
+                <TextBlock x:Name="filename" TextWrapping="WrapWithOverflow" Text="File Name : x"></TextBlock>
+            </Label>
 
             <Label Content="Song Title" Grid.Row="0" Background="{x:Null}"  BorderThickness="0,0,0,1" BorderBrush="#FFD7EFF5"/>
             <TextBox x:Name="songtitle" BorderBrush="#CC6CBCFF" BorderThickness="0,0,0,2" CaretBrush="Black" Background="#FFE1F3FF"></TextBox>
@@ -36,19 +38,26 @@
             <TextBox x:Name="year" PreviewTextInput="NumberValidation" BorderBrush="#FF6CBCFF" BorderThickness="0,0,0,2" Background="#FFE1F3FF"></TextBox>
 
             <Label Content="Cover Image" Background="{x:Null}"  BorderThickness="0,0,0,1" BorderBrush="#FFD7EFF5"/>
-            
-            
+
+
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="30"/>
                 </Grid.ColumnDefinitions>
-                
-                <TextBox x:Name="coverimg" BorderBrush="#FF6CBCFF" BorderThickness="0,0,0,2" Background="#FFE1F3FF" Grid.Column="0"></TextBox>
-                <Button Width="30" Content="..." Grid.Column="1"  Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Click="ChooseCover"></Button>
+
+
+                <StackPanel Grid.Column="0">
+                    <Image x:Name="img_thumbnail"></Image>
+                    <TextBox x:Name="coverimg" BorderBrush="#FF6CBCFF" BorderThickness="0,0,0,2" Background="#FFE1F3FF" PreviewMouseDown="CoverImage_Click"/>
+                </StackPanel>
+                <Button Width="30" Content="..." Grid.Column="1"  Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Click="ChooseCover" VerticalAlignment="Bottom" d:LayoutOverrides="TopMargin, BottomMargin"/>
+
+
+
             </Grid>
-            
-            
+
+
             <DockPanel Grid.Row="1">
 
 
