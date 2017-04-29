@@ -17,6 +17,9 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Net;
+using Newtonsoft.Json.Linq;
+using System.Configuration;
 
 namespace TagS
 {
@@ -80,7 +83,12 @@ namespace TagS
                     pic.Type = TagLib.PictureType.FrontCover; //Set as cover
                     pic.Description = "Cover Art";
                     pic.MimeType = System.Net.Mime.MediaTypeNames.Image.Jpeg;
-                    pic.Data = TagLib.ByteVector.FromPath(coverimg_path);
+
+                    if (coverimg_path.StartsWith("http"))//If we got the image from the AutoFill function -- the 
+                        pic.Data = null;//TagLib.ByteVector.FromString(img_thumbnail.Source,TagLib.StringType.Latin1);
+                    else
+                        pic.Data = TagLib.ByteVector.FromPath(coverimg_path);
+
                     file.Tag.Pictures = new TagLib.IPicture[1] { pic }; //Add the tag
 
                 }else if(coverimg.Text.ToLower() == "del")//"Erase" the cover art
@@ -90,7 +98,9 @@ namespace TagS
                 //Set the rest of the tags
                 file.Tag.Title = songtitle.Text;
                 file.Tag.Album = album.Text;
+                file.Tag.Track = Convert.ToUInt32(tracknum.Text);
                 file.Tag.Performers = new String[1] { artist.Text };
+
                 if (year.Text.Length != 0)//If a year has been given, use it
                     file.Tag.Year = Convert.ToUInt32(year.Text);
                 else
@@ -137,6 +147,7 @@ namespace TagS
 
             counter.Text = (count+1).ToString() + '/' + files.Length.ToString();
 
+            //Find Artist & Song name by checking the dashes
             //Check in case there are no dashes
             if (songname.LastIndexOf('-') >= 0)
                 songtitle.Text = songname.Substring(songname.LastIndexOf('-') + 2); //Text after '-' , '+2' so that there isn't whitespace before the string
@@ -149,16 +160,85 @@ namespace TagS
             else
                 artist.Text = "";
 
-            if (count + 1 == files.Length)
-                next.Content = "Finish[F2]";
-            else
-                next.Content = "Next[F2]";
 
             year.Text = "";
             genre.Text = "";
             album.Text = "";
 
+
+
+            //Check the internet for further info -- last.fm api
+            string apiKey = ConfigurationManager.AppSettings["APIKey"];//Get the API Key from the config
+            if (apiKey == null)
+            {
+                MessageBox.Show("Couldn't make request, incorrect APIKey", "Error!");
+                return;
+            }
+
+            string sURL = "http://ws.audioscrobbler.com/2.0/?method=track.getInfo&track="+songtitle.Text +"&artist="+artist.Text+ "&format=json&api_key=" + apiKey;
+
+            //Build the request
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(sURL);
+            request.AutomaticDecompression = DecompressionMethods.GZip;
+            request.UserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; .NET CLR 1.0.3705;)";
+
+            Console.WriteLine("Requesting : {0}",sURL);
+            Stream objStream = null;
+            StreamReader objReader;
+            JObject json;
+
+            try//to make the request
+            {
+                objStream = request.GetResponse().GetResponseStream();
+            } 
+            catch (System.Net.WebException e) {
+                MessageBox.Show("Connection not established...\n\n"+e, "Error!");
+                return;
+            }
+
+            //If it is succesfull read the data, turn them into JSON and set the tags
+            //Read data
+            objReader = new StreamReader(objStream);
+            //Turn into JSON
+            json = JObject.Parse(objReader.ReadToEnd());
+
+            if (json["error"] != null && (int)json["error"] == 6)//If there were no results
+            {
+                MessageBox.Show("Online request yield no results...\n\nMessage : " + json["message"], "Error!");
+                return;
+            }
+
+            //Set tags
+            if (json["track"]["album"] != null)//If the track belongs in an album, fill the appropriate fields
+            {
+                //Set artist & album name
+                artist.Text = (string)json["track"]["artist"]["name"];
+                album.Text = (string)json["track"]["album"]["title"];
+                tracknum.Text = (string)json["track"]["album"]["@attr"]["position"];
+
+
+                //Set thumbnail
+                //We download the image thumbnail via WebClient and then set it appropriately
+                var webClient = new WebClient();
+                byte[] imageBytes = webClient.DownloadData((string)json["track"]["album"]["image"][3]["#text"]);
+
+                img_thumbnail.Source = ToImage(imageBytes);
+                img_thumbnail.Width = 256;
+                img_thumbnail.Height = 256;
+                coverimg_path = (string)json["track"]["album"]["image"][3]["#text"];
+
+                //Set Genre
+                genre.Text = (string)json["track"]["toptags"]["tag"][0]["name"];
+            }
+
+
+            if (count + 1 == files.Length)
+                next.Content = "Finish[F2]";
+            else
+                next.Content = "Next[F2]";
         }
+
+    
 
         private void FillPreExisting()
         {
@@ -179,9 +259,11 @@ namespace TagS
             if(file.Tag.Year != 0)//If there is a valid year
                 year.Text = file.Tag.Year.ToString();
 
+            if (file.Tag.Track != 0)//If there is a valid track#
+                tracknum.Text = file.Tag.Track.ToString();
 
             album.Text = file.Tag.Album;//Assign the Album name either way
-
+            
 
             if (file.Tag.Genres.Length > 0)//If any Genre has been given
                 genre.Text = file.Tag.Genres[0];
@@ -189,12 +271,16 @@ namespace TagS
             if (file.Tag.Pictures.Length > 0)
             {
                 var bin = file.Tag.Pictures[0].Data.Data; //Create a byte[] out of the tag data
+                var convertedimage = ToImage(bin);
 
-                img_thumbnail.Source = ToImage(bin);//Make it an image and display it
-                img_thumbnail.Height = 256;
-                img_thumbnail.Width = 256;
+                if (convertedimage != null)//If the image has been read successfully
+                {
+                    img_thumbnail.Source = ToImage(bin);//Make it an image and display it
+                    img_thumbnail.Height = 256;
+                    img_thumbnail.Width = 256;
 
-                coverimg.Text = "Type 'Del' to erase the cover";
+                    coverimg.Text = "Type 'Del' to erase the cover";
+                }
             }
             else {
 
@@ -238,6 +324,7 @@ namespace TagS
         {
             songtitle.Text = "";
             album.Text = "";
+            tracknum.Text = "";
             artist.Text = "";
             year.Text = "";
             genre.Text = "";
@@ -249,7 +336,15 @@ namespace TagS
             BitmapImage image = new BitmapImage();
             image.BeginInit();
             image.StreamSource = new System.IO.MemoryStream(array);
-            image.EndInit();
+            try
+            {
+                image.EndInit();
+            }
+            catch(NotSupportedException e)
+            {
+                System.Windows.MessageBox.Show("Oh my...something went wrong when analysing the cover art...weird!\nDo me a favor and create an issue on github!\n\nHere's the exception : \n"+e, "Error!",MessageBoxButton.OK,MessageBoxImage.Warning);
+                return null;
+            }
             return image;
         }
 

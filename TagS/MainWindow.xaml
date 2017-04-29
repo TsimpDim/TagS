@@ -31,6 +31,9 @@
             <Label Content="Album " Background="{x:Null}"  BorderThickness="0,0,0,1" BorderBrush="#FFD7EFF5"/>
             <TextBox x:Name="album" BorderBrush="#FF6CBCFF" BorderThickness="0,0,0,2" Background="#FFE1F3FF"></TextBox>
 
+            <Label Content="Track#" Background="{x:Null}"  BorderThickness="0,0,0,1" BorderBrush="#FFD7EFF5"/>
+            <TextBox x:Name="tracknum" PreviewTextInput="NumberValidation" BorderBrush="#FF6CBCFF" BorderThickness="0,0,0,2" Background="#FFE1F3FF"></TextBox>
+
             <Label Content="Genre " Background="{x:Null}"  BorderThickness="0,0,0,1" BorderBrush="#FFD7EFF5"/>
             <TextBox x:Name="genre" BorderBrush="#FF6CBCFF" BorderThickness="0,0,0,2" Background="#FFE1F3FF"></TextBox>
 
