@@ -84,8 +84,11 @@ namespace TagS
                     pic.Description = "Cover Art";
                     pic.MimeType = System.Net.Mime.MediaTypeNames.Image.Jpeg;
 
-                    if (coverimg_path.StartsWith("http"))//If we got the image from the AutoFill function -- the 
-                        pic.Data = null;//TagLib.ByteVector.FromString(img_thumbnail.Source,TagLib.StringType.Latin1);
+                    if (coverimg_path.StartsWith("http"))//If we got the image from the AutoFill function -- the API
+                    {
+                        pic.Data = TagLib.ByteVector.FromPath("/Thumbnails_temp/" + songtitle.Text + ".jpg");
+                        File.Delete("/Thumbnails_temp/" + songtitle.Text + ".jpg");
+                    }
                     else
                         pic.Data = TagLib.ByteVector.FromPath(coverimg_path);
 
@@ -98,8 +101,15 @@ namespace TagS
                 //Set the rest of the tags
                 file.Tag.Title = songtitle.Text;
                 file.Tag.Album = album.Text;
-                file.Tag.Track = Convert.ToUInt32(tracknum.Text);
                 file.Tag.Performers = new String[1] { artist.Text };
+
+
+
+                if (tracknum.Text.Length != 0)//If a track number has been given,use it
+                    file.Tag.Track = Convert.ToUInt32(tracknum.Text);
+                else
+                    file.Tag.Track = 0;
+
 
                 if (year.Text.Length != 0)//If a year has been given, use it
                     file.Tag.Year = Convert.ToUInt32(year.Text);
@@ -141,6 +151,7 @@ namespace TagS
 
         public void AutoFillFields()
         {
+            string regex = "(\\[.*\\])|(\".*\")|('.*')|(\\(.*\\))";
             var songname = System.IO.Path.GetFileNameWithoutExtension(files[count]);
             filename.Text = "File Name : " + System.IO.Path.GetFileName(files[count]); //Display the file name on the header
 
@@ -150,13 +161,20 @@ namespace TagS
             //Find Artist & Song name by checking the dashes
             //Check in case there are no dashes
             if (songname.LastIndexOf('-') >= 0)
+            {
                 songtitle.Text = songname.Substring(songname.LastIndexOf('-') + 2); //Text after '-' , '+2' so that there isn't whitespace before the string
+                songtitle.Text = Regex.Replace(songtitle.Text, regex,string.Empty); //Remove any delimeters and text in-between
+            }
             else
                 songtitle.Text = songname;
 
 
             if (songname.IndexOf('-') >= 0)
-                artist.Text = songname.Substring(0, songname.IndexOf('-') - 1); //Text before it , likewise '-1'
+            {
+                artist.Text = songname.Substring(0, songname.IndexOf('-') - 1); //Text before it , '-1' so that there isn't whitespace before the string
+                artist.Text = Regex.Replace(artist.Text, regex, string.Empty);//Remove any delimeters and text in-between
+
+            }
             else
                 artist.Text = "";
 
@@ -225,6 +243,14 @@ namespace TagS
                 img_thumbnail.Source = ToImage(imageBytes);
                 img_thumbnail.Width = 256;
                 img_thumbnail.Height = 256;
+
+                using (System.Drawing.Image image = System.Drawing.Image.FromStream(new MemoryStream(imageBytes)))
+                {
+                    image.Save("/Thumbnails_temp/"+songtitle.Text+".jpg", ImageFormat.Jpeg);
+                }
+
+
+
                 coverimg_path = (string)json["track"]["album"]["image"][3]["#text"];
 
                 //Set Genre
