@@ -20,6 +20,7 @@ using System.Drawing.Imaging;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using System.Configuration;
+using System.Globalization;
 
 namespace TagS
 {
@@ -93,7 +94,6 @@ namespace TagS
                     {
                         pic.Data = TagLib.ByteVector.FromPath(@".\Thumb_tmp\" + songtitle.Text + ".jpg");
                         File.Delete(@".\Thumb_tmp\" + songtitle.Text + ".jpg");
-                        //Close(image); //Close the stream since it is no longer needed after deleting the image
                     }
                     else
                         pic.Data = TagLib.ByteVector.FromPath(coverimg_path);
@@ -122,7 +122,10 @@ namespace TagS
                 else
                     file.Tag.Year = 0;
 
-                file.Tag.Genres = new String[1] { genre.Text };
+
+                //Set Genre
+                string[] genreString = Array.ConvertAll(genre.Text.Split(','), Convert.ToString);//Create an array whose elements are the genres we have seperated with commas (',')
+                file.Tag.Genres = genreString;
 
 
                 file.Save(); //Save the file!
@@ -252,9 +255,22 @@ namespace TagS
             }
 
             //Set Genre
-            if(json["track"]["toptags"]["tag"].Count() > 0)
-                genre.Text = (string)json["track"]["toptags"]["tag"][0]["name"];
-               
+            //If there is just one tag
+            if(json["track"]["toptags"]["tag"].Count() == 1)
+            {
+                TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+                genre.Text = textInfo.ToTitleCase((string)json["track"]["toptags"]["tag"][0]["name"]);//Make The First Letter Of Each Word Capital
+            }
+            //If there more than one tags (set just the first two)
+            else if (json["track"]["toptags"]["tag"].Count() > 1)
+            {
+                TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+                string firstG = (string)json["track"]["toptags"]["tag"][0]["name"];
+                string secG = (string)json["track"]["toptags"]["tag"][1]["name"];
+
+                genre.Text = textInfo.ToTitleCase(firstG +","+ secG);//Make The First Letter Of Each Word Capital
+            }
+
             //Set Artist name
             artist.Text = (string)json["track"]["artist"]["name"];
 
@@ -279,7 +295,7 @@ namespace TagS
 
        
 
-
+            //Read primary tags
             if (file.Tag.Performers.Length > 0)//If there are any performers
                 artist.Text = file.Tag.Performers[0];
 
@@ -290,11 +306,29 @@ namespace TagS
                 tracknum.Text = file.Tag.Track.ToString();
 
             album.Text = file.Tag.Album;//Assign the Album name either way
-            
 
+            //Read genres
             if (file.Tag.Genres.Length > 0)//If any Genre has been given
-                genre.Text = file.Tag.Genres[0];
+            {
+                //Build the string "Genre1,Genre2,...."
+                int i = 0;
+                genre.Text = "";
+                TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
 
+                do
+                {
+                    if(i > 0)
+                        genre.Text += textInfo.ToTitleCase(","+file.Tag.Genres[i]);
+                    else
+                        genre.Text += textInfo.ToTitleCase(file.Tag.Genres[i]);
+
+                    i++;
+
+                } while (i < file.Tag.Genres.Count());
+            }
+
+
+            //Read cover art
             if (file.Tag.Pictures.Length > 0)
             {
                 var bin = file.Tag.Pictures[0].Data.Data; //Create a byte[] out of the tag data
