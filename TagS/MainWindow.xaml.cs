@@ -36,6 +36,11 @@ namespace TagS
         public MainWindow()
         {
             InitializeComponent();
+            string path = @".\Thumb_tmp";
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
             autofillbut.Visibility = Visibility.Hidden; 
         }
 
@@ -86,8 +91,9 @@ namespace TagS
 
                     if (coverimg_path.StartsWith("http"))//If we got the image from the AutoFill function -- the API
                     {
-                        pic.Data = TagLib.ByteVector.FromPath("/Thumbnails_temp/" + songtitle.Text + ".jpg");
-                        File.Delete("/Thumbnails_temp/" + songtitle.Text + ".jpg");
+                        pic.Data = TagLib.ByteVector.FromPath(@".\Thumb_tmp\" + songtitle.Text + ".jpg");
+                        File.Delete(@".\Thumb_tmp\" + songtitle.Text + ".jpg");
+                        //Close(image); //Close the stream since it is no longer needed after deleting the image
                     }
                     else
                         pic.Data = TagLib.ByteVector.FromPath(coverimg_path);
@@ -151,7 +157,6 @@ namespace TagS
 
         public void AutoFillFields()
         {
-            string regex = "(\\[.*\\])|(\".*\")|('.*')|(\\(.*\\))";
             var songname = System.IO.Path.GetFileNameWithoutExtension(files[count]);
             filename.Text = "File Name : " + System.IO.Path.GetFileName(files[count]); //Display the file name on the header
 
@@ -162,21 +167,14 @@ namespace TagS
             //Check in case there are no dashes
             if (songname.LastIndexOf('-') >= 0)
             {
-                songtitle.Text = songname.Substring(songname.LastIndexOf('-') + 2); //Text after '-' , '+2' so that there isn't whitespace before the string
-                songtitle.Text = Regex.Replace(songtitle.Text, regex,string.Empty); //Remove any delimeters and text in-between
+                songtitle.Text = FormatName(songname.Substring(songname.LastIndexOf('-') + 1)); //Text after '-' , '+1' to dismiss the dash
+                artist.Text = FormatName(songname.Substring(0, songname.IndexOf('-')));
             }
             else
-                songtitle.Text = songname;
-
-
-            if (songname.IndexOf('-') >= 0)
             {
-                artist.Text = songname.Substring(0, songname.IndexOf('-') - 1); //Text before it , '-1' so that there isn't whitespace before the string
-                artist.Text = Regex.Replace(artist.Text, regex, string.Empty);//Remove any delimeters and text in-between
-
-            }
-            else
+                songtitle.Text = songname;
                 artist.Text = "";
+            }
 
 
             year.Text = "";
@@ -229,8 +227,7 @@ namespace TagS
             //Set tags
             if (json["track"]["album"] != null)//If the track belongs in an album, fill the appropriate fields
             {
-                //Set artist & album name
-                artist.Text = (string)json["track"]["artist"]["name"];
+                //Set album name & track num
                 album.Text = (string)json["track"]["album"]["title"];
                 tracknum.Text = (string)json["track"]["album"]["@attr"]["position"];
 
@@ -246,16 +243,20 @@ namespace TagS
 
                 using (System.Drawing.Image image = System.Drawing.Image.FromStream(new MemoryStream(imageBytes)))
                 {
-                    image.Save("/Thumbnails_temp/"+songtitle.Text+".jpg", ImageFormat.Jpeg);
+                    image.Save(@".\Thumb_tmp\" + songtitle.Text + ".jpg", ImageFormat.Jpeg);
                 }
 
 
 
                 coverimg_path = (string)json["track"]["album"]["image"][3]["#text"];
-
-                //Set Genre
-                genre.Text = (string)json["track"]["toptags"]["tag"][0]["name"];
             }
+
+            //Set Genre
+            if(json["track"]["toptags"]["tag"].Count() > 0)
+                genre.Text = (string)json["track"]["toptags"]["tag"][0]["name"];
+               
+            //Set Artist name
+            artist.Text = (string)json["track"]["artist"]["name"];
 
 
             if (count + 1 == files.Length)
@@ -374,6 +375,23 @@ namespace TagS
             return image;
         }
 
+        public string FormatName(string str)
+        {
+            if (str == null) return "";
+            string regex = "(\\[.*\\])|(\".*\")|('.*')|(\\(.*\\))";
+
+            str = Regex.Replace(str, regex, string.Empty); //Remove any delimeters - ({[ - and text in-between
+
+            //If there is whitespace in the first/last position of the name, remove it
+            if (str[0] == ' ')
+                str = str.Substring(1);
+
+            if (str[str.Length - 1] == ' ')
+                str = str.Remove(str.Length - 1);
+
+
+            return str;
+        }
 
         public bool HasTags()
         {
