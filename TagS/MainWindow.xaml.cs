@@ -188,9 +188,10 @@ namespace TagS
 
             //Check the internet for further info -- last.fm api
             string apiKey = ConfigurationManager.AppSettings["APIKey"];//Get the API Key from the config
+            status.Text = "Status : Sending Request";
             if (apiKey == null)
             {
-                MessageBox.Show("Couldn't make request, incorrect APIKey", "Error!");
+                status.Text = "Status : Couldn't make request, incorrect APIKey";
                 return;
             }
 
@@ -210,12 +211,13 @@ namespace TagS
             {
                 objStream = request.GetResponse().GetResponseStream();
             } 
-            catch (System.Net.WebException e) {
-                MessageBox.Show("Connection not established...\n\n"+e, "Error!");
+            catch (System.Net.WebException) {
+                status.Text = "Status : Connection not established...";
                 return;
             }
 
             //If it is succesfull read the data, turn them into JSON and set the tags
+            status.Text = "Status : Request successfull";
             //Read data
             objReader = new StreamReader(objStream);
             //Turn into JSON
@@ -223,7 +225,7 @@ namespace TagS
 
             if (json["error"] != null && (int)json["error"] == 6)//If there were no results
             {
-                MessageBox.Show("Online request yield no results...\n\nMessage : " + json["message"], "Error!");
+                status.Text = "Status : Online request yielded no results...";
                 return;
             }
 

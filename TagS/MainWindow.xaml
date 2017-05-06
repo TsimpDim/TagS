@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:TagS"
         mc:Ignorable="d"
         KeyDown="ShortcutKeys"
+        Icon=".\Resources\TagSIcon-512.png"
         Title="MainWindow" SizeToContent="Height" Width="400">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -54,8 +55,8 @@
                     <Image x:Name="img_thumbnail"></Image>
                     <TextBox x:Name="coverimg" BorderBrush="#FF6CBCFF" BorderThickness="0,0,0,2" Background="#FFE1F3FF" PreviewMouseDown="CoverImage_Click"/>
                 </StackPanel>
-                <Button Width="30" Content="..." Grid.Column="1"  Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Click="ChooseCover" VerticalAlignment="Bottom" d:LayoutOverrides="TopMargin, BottomMargin"/>
 
+                <Button Width="30" Content="..." Grid.Column="1"  Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Click="ChooseCover" VerticalAlignment="Bottom" d:LayoutOverrides="TopMargin, BottomMargin"/>
 
 
             </Grid>
@@ -72,6 +73,15 @@
                 <Button x:Name="autofillbut"  Content="AutoFill[F3]" Height="20" Width="auto"  DockPanel.Dock="Left" HorizontalAlignment="Left" Click="AutoFill_Button" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Padding="6 0 6 0" Margin="5 0 0 0"/>
 
             </DockPanel>
+
+            <TextBlock  x:Name="status" Text="Status : OK" FontStyle="Italic" TextDecorations="{x:Null}">
+                <TextBlock.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
+                        <GradientStop Color="#FFCFCFCF" Offset="1"/>
+                        <GradientStop Color="White" Offset="0.66"/>
+                    </LinearGradientBrush>
+                </TextBlock.Background></TextBlock>
+
         </StackPanel>
     </Grid>
 </Window>
