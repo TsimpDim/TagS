@@ -1,21 +1,11 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Text.RegularExpressions;
 using System.IO;
-using System.Drawing;
 using System.Drawing.Imaging;
 using System.Net;
 using Newtonsoft.Json.Linq;
@@ -493,11 +483,13 @@ namespace TagS
 
         private void Back_Button(object sender, RoutedEventArgs e)
         {
+            status.Text = "Status : OK";
             GoBack();
         }
 
         private void Next_Button(object sender, RoutedEventArgs e)
         {
+            status.Text = "Status : OK";
             SetTags();
         }
 
