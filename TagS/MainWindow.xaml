@@ -8,7 +8,25 @@
         KeyDown="ShortcutKeys"
         Icon=".\Resources\TagSIcon-512.png"
         Title="MainWindow" SizeToContent="Height" Width="400">
+    
+    
+    
     <Grid>
+        <Grid.Resources>
+            <Style TargetType="Label">
+                <Setter Property="Background" Value="{x:Null}"></Setter>
+                <Setter Property="BorderThickness" Value="0,0,0,1"></Setter>
+                <Setter Property="BorderBrush" Value="#FFD7EFF5"></Setter>
+            </Style>
+            <Style TargetType="TextBox">
+                <Setter Property="BorderThickness" Value="0,0,0,2"></Setter>
+                <Setter Property="BorderBrush" Value="#CC6CBCFF"></Setter>
+                <Setter Property="CaretBrush" Value="Black"></Setter>
+                <Setter Property="Background" Value="#FFE1F3FF"></Setter>
+            </Style>
+
+        </Grid.Resources>
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition Width="0*"/>
@@ -19,29 +37,31 @@
         </Grid.RowDefinitions>
 
         <StackPanel>
+           
+            
             <Label  BorderThickness="0,0,0,3" BorderBrush="#FFB4B4B4" Background="White" FontWeight="Bold">
                 <TextBlock x:Name="filename" TextWrapping="WrapWithOverflow" Text="File Name : x"></TextBlock>
             </Label>
 
-            <Label Content="Song Title" Grid.Row="0" Background="{x:Null}"  BorderThickness="0,0,0,1" BorderBrush="#FFD7EFF5"/>
-            <TextBox x:Name="songtitle" BorderBrush="#CC6CBCFF" BorderThickness="0,0,0,2" CaretBrush="Black" Background="#FFE1F3FF"></TextBox>
+            <Label Content="Song Title" Grid.Row="0"/>
+            <TextBox x:Name="songtitle"></TextBox>
 
-            <Label Content="Artist " Background="{x:Null}" BorderThickness="0,0,0,1" BorderBrush="#FFD7EFF5"/>
-            <TextBox x:Name="artist" BorderBrush="#FF6CBCFF" BorderThickness="0,0,0,2" Background="#FFE1F3FF"></TextBox>
+            <Label Content="Artist "/>
+            <TextBox x:Name="artist"></TextBox>
 
-            <Label Content="Album " Background="{x:Null}"  BorderThickness="0,0,0,1" BorderBrush="#FFD7EFF5"/>
-            <TextBox x:Name="album" BorderBrush="#FF6CBCFF" BorderThickness="0,0,0,2" Background="#FFE1F3FF"></TextBox>
+            <Label Content="Album "/>
+            <TextBox x:Name="album"></TextBox>
 
-            <Label Content="Track#" Background="{x:Null}"  BorderThickness="0,0,0,1" BorderBrush="#FFD7EFF5"/>
-            <TextBox x:Name="tracknum" PreviewTextInput="NumberValidation" BorderBrush="#FF6CBCFF" BorderThickness="0,0,0,2" Background="#FFE1F3FF"></TextBox>
+            <Label Content="Track#"/>
+            <TextBox x:Name="tracknum" PreviewTextInput="NumberValidation"></TextBox>
 
-            <Label Content="Genre " Background="{x:Null}"  BorderThickness="0,0,0,1" BorderBrush="#FFD7EFF5"/>
-            <TextBox x:Name="genre" BorderBrush="#FF6CBCFF" BorderThickness="0,0,0,2" Background="#FFE1F3FF"></TextBox>
+            <Label Content="Genre "/>
+            <TextBox x:Name="genre"></TextBox>
 
-            <Label Content="Year " Background="{x:Null}"  BorderThickness="0,0,0,1" BorderBrush="#FFD7EFF5"/>
-            <TextBox x:Name="year" PreviewTextInput="NumberValidation" BorderBrush="#FF6CBCFF" BorderThickness="0,0,0,2" Background="#FFE1F3FF"></TextBox>
+            <Label Content="Year "/>
+            <TextBox x:Name="year" PreviewTextInput="NumberValidation" ></TextBox>
 
-            <Label Content="Cover Image" Background="{x:Null}"  BorderThickness="0,0,0,1" BorderBrush="#FFD7EFF5"/>
+            <Label Content="Cover Image" />
 
 
             <Grid>
@@ -53,7 +73,7 @@
 
                 <StackPanel Grid.Column="0">
                     <Image x:Name="img_thumbnail"></Image>
-                    <TextBox x:Name="coverimg" BorderBrush="#FF6CBCFF" BorderThickness="0,0,0,2" Background="#FFE1F3FF" PreviewMouseDown="CoverImage_Click"/>
+                    <TextBox x:Name="coverimg" PreviewMouseDown="CoverImage_Click"/>
                 </StackPanel>
 
                 <Button Width="30" Content="..." Grid.Column="1"  Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Click="ChooseCover" VerticalAlignment="Bottom" d:LayoutOverrides="TopMargin, BottomMargin"/>
@@ -74,6 +94,7 @@
 
             </DockPanel>
 
+            <StackPanel>
             <TextBlock  x:Name="status" Text="Status : OK" FontStyle="Italic" TextDecorations="{x:Null}">
                 <TextBlock.Background>
                     <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
@@ -81,7 +102,7 @@
                         <GradientStop Color="White" Offset="0.66"/>
                     </LinearGradientBrush>
                 </TextBlock.Background></TextBlock>
-
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>
