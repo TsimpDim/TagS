@@ -39,6 +39,7 @@ namespace TagS
 
         private void Choose_Directory(object sender, RoutedEventArgs e)
         {
+            coverimg_path = "";
             OpenFileDialog openDlg = new OpenFileDialog(); //Create a new FileDialog
             openDlg.Multiselect = true;//Allow the user to select multiple files
             openDlg.Filter = "MP3 Files (*.mp3) |*.mp3"; //Allow only .pdf's
@@ -63,7 +64,9 @@ namespace TagS
 
         private void SetTags()
         {
-            if(files.Length == 0 || files[0] == "-1")
+            status.Text = "Status : OK";
+
+            if (files.Length == 0 || files[0] == "-1")
             {
                 System.Windows.MessageBox.Show("Please select music files to examine...", "Error!");
                 return;
@@ -82,11 +85,23 @@ namespace TagS
 
                     if (coverimg_path.StartsWith("http"))//If we got the image from the AutoFill function -- the API
                     {
-                        pic.Data = TagLib.ByteVector.FromPath(@".\Thumb_tmp\" + songtitle.Text + ".jpg");
-                        File.Delete(@".\Thumb_tmp\" + songtitle.Text + ".jpg");
+                        try
+                        {
+                            pic.Data = TagLib.ByteVector.FromPath(@".\Thumb_tmp\" + songtitle.Text + ".jpg");
+                            File.Delete(@".\Thumb_tmp\" + songtitle.Text + ".jpg");
+                        }
+                        catch (System.IO.FileNotFoundException)//It has already been deleted
+                        {
+                            return;
+                        }
                     }
                     else
-                        pic.Data = TagLib.ByteVector.FromPath(coverimg_path);
+                    {
+                        if(coverimg_path.Length != 0)
+                        {
+                            pic.Data = TagLib.ByteVector.FromPath(coverimg_path);
+                        }
+                    }
 
                     file.Tag.Pictures = new TagLib.IPicture[1] { pic }; //Add the tag
 
@@ -117,8 +132,15 @@ namespace TagS
                 string[] genreString = Array.ConvertAll(genre.Text.Split(','), Convert.ToString);//Create an array whose elements are the genres we have seperated with commas (',')
                 file.Tag.Genres = genreString;
 
-
-                file.Save(); //Save the file!
+                try
+                {
+                    file.Save(); //Save the file!
+                }
+                catch (System.IO.IOException)
+                {
+                    status.Text = "File is being used , can't save";
+                    return;
+                }
                 count++;
 
                 EmptyTextFields();
@@ -230,20 +252,24 @@ namespace TagS
                 //Set thumbnail
                 //We download the image thumbnail via WebClient and then set it appropriately
                 var webClient = new WebClient();
-                byte[] imageBytes = webClient.DownloadData((string)json["track"]["album"]["image"][3]["#text"]);
-
-                img_thumbnail.Source = ToImage(imageBytes);
-                img_thumbnail.Width = 256;
-                img_thumbnail.Height = 256;
-
-                using (System.Drawing.Image image = System.Drawing.Image.FromStream(new MemoryStream(imageBytes)))
+                string image_link = (string)json["track"]["album"]["image"][3]["#text"];
+                if(image_link.Length != 0)
                 {
-                    image.Save(@".\Thumb_tmp\" + songtitle.Text + ".jpg", ImageFormat.Jpeg);
+                    byte[] imageBytes = webClient.DownloadData(image_link);
+                    img_thumbnail.Source = ToImage(imageBytes);
+                    img_thumbnail.Width = 256;
+                    img_thumbnail.Height = 256;
+
+                    using (System.Drawing.Image image = System.Drawing.Image.FromStream(new MemoryStream(imageBytes)))
+                    {
+                       image.Save(@".\Thumb_tmp\" + songtitle.Text + ".jpg", ImageFormat.Jpeg);
+                    }
+
+
+
+                    coverimg_path = (string)json["track"]["album"]["image"][3]["#text"];
                 }
 
-
-
-                coverimg_path = (string)json["track"]["album"]["image"][3]["#text"];
             }
 
             //Set Genre
@@ -360,6 +386,7 @@ namespace TagS
 
         private void GoBack()
         {
+            status.Text = "Status : OK";
             if (count >= 1)
             {
                 count--;
@@ -483,7 +510,6 @@ namespace TagS
 
         private void Back_Button(object sender, RoutedEventArgs e)
         {
-            status.Text = "Status : OK";
             GoBack();
         }
 

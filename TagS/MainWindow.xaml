@@ -17,14 +17,19 @@
                 <Setter Property="Background" Value="{x:Null}"></Setter>
                 <Setter Property="BorderThickness" Value="0,0,0,1"></Setter>
                 <Setter Property="BorderBrush" Value="#FFD7EFF5"></Setter>
+                <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
             </Style>
+            
             <Style TargetType="TextBox">
                 <Setter Property="BorderThickness" Value="0,0,0,2"></Setter>
                 <Setter Property="BorderBrush" Value="#CC6CBCFF"></Setter>
                 <Setter Property="CaretBrush" Value="Black"></Setter>
                 <Setter Property="Background" Value="#FFE1F3FF"></Setter>
+                <Setter Property="VerticalAlignment" Value="Stretch"></Setter>
             </Style>
 
+            <Style BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" TargetType="Button"></Style>
+            
         </Grid.Resources>
         
         <Grid.ColumnDefinitions>
@@ -36,9 +41,9 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <StackPanel>
-           
-            
+        <StackPanel Grid.Row="1">
+
+
             <Label  BorderThickness="0,0,0,3" BorderBrush="#FFB4B4B4" Background="White" FontWeight="Bold">
                 <TextBlock x:Name="filename" TextWrapping="WrapWithOverflow" Text="File Name : x"></TextBlock>
             </Label>
@@ -76,7 +81,7 @@
                     <TextBox x:Name="coverimg" PreviewMouseDown="CoverImage_Click"/>
                 </StackPanel>
 
-                <Button Width="30" Content="..." Grid.Column="1"  Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Click="ChooseCover" VerticalAlignment="Bottom" d:LayoutOverrides="TopMargin, BottomMargin"/>
+                <Button Width="30" Content="..." Grid.Column="1" BorderBrush="#FF4AA5FF" Click="ChooseCover" VerticalAlignment="Bottom" d:LayoutOverrides="TopMargin, BottomMargin"/>
 
 
             </Grid>
@@ -85,24 +90,16 @@
             <DockPanel Grid.Row="1">
 
 
-                <Button x:Name="next" Content="Next[F2]" Height="20" Width="60"  DockPanel.Dock="Right" HorizontalAlignment="Right" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Margin="2 5 0 5" Padding="0 0 0 2" Click="Next_Button"></Button>
-                <Button Content="Back[F1]" Height="20" Width="50"  DockPanel.Dock="Right" HorizontalAlignment="Center" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Click="Back_Button" Padding="0 0 0 2"></Button>
+                <Button x:Name="next" Content="Next[F2]" Height="20" Width="60"  DockPanel.Dock="Right" HorizontalAlignment="Right" BorderBrush="#FF4AA5FF" Margin="2 5 0 5" Padding="0 0 0 2" Click="Next_Button"></Button>
+                <Button Content="Back[F1]" Height="20" Width="50"  DockPanel.Dock="Right" HorizontalAlignment="Center"  BorderBrush="#FF4AA5FF" Click="Back_Button" Padding="0 0 0 2"></Button>
                 <TextBlock  x:Name="counter" DockPanel.Dock="Right" HorizontalAlignment="Center" Text="x/x" VerticalAlignment="Center" Margin="0 0 10 0"/>
 
-                <Button Content="Choose files" Height="20" Width="auto"  DockPanel.Dock="Left" HorizontalAlignment="Left" Click="Choose_Directory" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Padding="6 0 6 0"/>
-                <Button x:Name="autofillbut"  Content="AutoFill[F3]" Height="20" Width="auto"  DockPanel.Dock="Left" HorizontalAlignment="Left" Click="AutoFill_Button" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" BorderBrush="#FF4AA5FF" Padding="6 0 6 0" Margin="5 0 0 0"/>
+                <Button Content="Choose files" Height="20" Width="auto"  DockPanel.Dock="Left" HorizontalAlignment="Left" Click="Choose_Directory" BorderBrush="#FF4AA5FF" Padding="6 0 6 0"/>
+                <Button x:Name="autofillbut"  Content="AutoFill[F3]" Height="20" Width="auto"  DockPanel.Dock="Left" HorizontalAlignment="Left" Click="AutoFill_Button" BorderBrush="#FF4AA5FF" Padding="6 0 6 0" Margin="5 0 0 0"/>
 
             </DockPanel>
 
-            <StackPanel>
-            <TextBlock  x:Name="status" Text="Status : OK" FontStyle="Italic" TextDecorations="{x:Null}">
-                <TextBlock.Background>
-                    <LinearGradientBrush EndPoint="0.5,1" MappingMode="RelativeToBoundingBox" StartPoint="0.5,0">
-                        <GradientStop Color="#FFCFCFCF" Offset="1"/>
-                        <GradientStop Color="White" Offset="0.66"/>
-                    </LinearGradientBrush>
-                </TextBlock.Background></TextBlock>
-            </StackPanel>
+            <TextBlock  x:Name="status" Text="Status : OK" FontStyle="Italic" TextDecorations="{x:Null}" Background="#7FD8D8D8"/>
         </StackPanel>
     </Grid>
 </Window>
