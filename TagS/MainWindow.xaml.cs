@@ -88,7 +88,7 @@ namespace TagS
                         try
                         {
                             pic.Data = TagLib.ByteVector.FromPath(@".\Thumb_tmp\" + songtitle.Text + ".jpg");
-                            File.Delete(@".\Thumb_tmp\" + songtitle.Text + ".jpg");
+                            file.Tag.Pictures = new TagLib.IPicture[1] { pic }; //Add the tag
                         }
                         catch (System.IO.FileNotFoundException)//It has already been deleted
                         {
@@ -97,13 +97,13 @@ namespace TagS
                     }
                     else
                     {
-                        if(coverimg_path.Length != 0)
+                        if (coverimg_path.Length != 0)
                         {
                             pic.Data = TagLib.ByteVector.FromPath(coverimg_path);
+                            file.Tag.Pictures = new TagLib.IPicture[1] { pic }; //Add the tag
                         }
                     }
 
-                    file.Tag.Pictures = new TagLib.IPicture[1] { pic }; //Add the tag
 
                 }else if(coverimg.Text.ToLower() == "del")//"Erase" the cover art
                     file.Tag.Pictures = null;
@@ -246,7 +246,12 @@ namespace TagS
             {
                 //Set album name & track num
                 album.Text = (string)json["track"]["album"]["title"];
-                tracknum.Text = (string)json["track"]["album"]["@attr"]["position"];
+                string track = null;
+                if (json["track"]["album"]["@attr"] != null)
+                {
+                    track = (string)json["track"]["album"]["@attr"]["position"];
+                }
+                tracknum.Text = track ?? null;
 
 
                 //Set thumbnail
@@ -391,6 +396,7 @@ namespace TagS
             {
                 count--;
                 EmptyTextFields();
+                coverimg_path = "-1";
                 //AutoFillFields();
                 FillPreExisting();
             }
@@ -422,7 +428,7 @@ namespace TagS
             }
             catch(NotSupportedException e)
             {
-                System.Windows.MessageBox.Show("Oh my...something went wrong when analysing the cover art...weird!\nDo me a favor and create an issue on github!\n\nHere's the exception : \n"+e, "Error!",MessageBoxButton.OK,MessageBoxImage.Warning);
+                status.Text = "Status : Cover couldn't be retrieved :(";
                 return null;
             }
             return image;
@@ -430,14 +436,17 @@ namespace TagS
 
         public string FormatName(string str)
         {
-            if (str == null) return "";
-            string regex = "(\\[.*\\])|(\".*\")|('.*')|(\\(.*\\))";
 
+            string regex = "(\\[.*\\])|(\".*\")|('.*')|(\\(.*\\))";
             str = Regex.Replace(str, regex, string.Empty); //Remove any delimeters - ({[ - and text in-between
+
+            if (String.IsNullOrWhiteSpace(str))
+                return "";
+
 
             //If there is whitespace in the first/last position of the name, remove it
             if (str[0] == ' ')
-                str = str.Substring(1);
+                str = str.Remove(0,1);
 
             if (str[str.Length - 1] == ' ')
                 str = str.Remove(str.Length - 1);
