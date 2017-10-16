@@ -156,12 +156,18 @@ namespace TagS
                 else
                 {
                     Application.Current.Shutdown(); //Not sure if i can merge this with the one IF below
+                    string[] filePaths = Directory.GetFiles(@".\Thumb_tmp\");
+                    foreach (string filePath in filePaths)
+                        File.Delete(filePath);
                 }
 
             }
             else
             {
                 Application.Current.Shutdown();
+                string[] filePaths = Directory.GetFiles(@".\Thumb_tmp\");
+                foreach (string filePath in filePaths)
+                    File.Delete(filePath);
             }
         }
 
